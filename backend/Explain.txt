@@ -1,0 +1,31 @@
+POST /api/auth/register      ✅ User signup
+POST /api/auth/login         ✅ JWT token
+GET  /api/auth/profile       ✅ User data (protected)
+
+POST /api/posts/generate     ✅ AI post (protected)
+GET  /api/posts/history      ✅ User posts (protected)
+
+POST /api/subscription/create-session  ✅ Stripe checkout
+POST /api/subscription/webhook         ✅ Stripe events
+GET  /api/subscription/status          ✅ Plan status
+
+GET  /api/hashtags/trending?location=karachi  ✅ Public
+GET  /health                                  ✅ Server status
+
+
+
+
+🧪 TEST ENDPOINTS
+text
+# Normal rate limit: 100 req/15min per IP
+# AI generation: 10 req/minute per IP  
+# User limit: 5 posts/day (free), unlimited (pro)
+
+AI CONFIGURATION
+- **AI_PROVIDER**: `OPENAI` (default) or `GEMINI` to switch providers.
+- **OPENAI_API_KEY / OPENAI_MODEL**: credentials and model for OpenAI.
+- **GEMINI_API_KEY / GEMINI_MODEL**: credentials and model for Google Generative AI (Gemini).
+
+Notes:
+- If `AI_PROVIDER=GEMINI`, set `GEMINI_API_KEY` and optionally `GEMINI_MODEL`.
+- The server will fallback to OpenAI if provider is not set or missing keys.

@@ -1,0 +1,7 @@
+/.env
+/node_modules
+/.env.example
+/Example.txt
+/API_TESTING.txt
+/codespace_backend_live.txt
+
