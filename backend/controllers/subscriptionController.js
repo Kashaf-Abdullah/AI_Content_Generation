@@ -1,4 +1,9 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+} else {
+  console.warn('⚠️ STRIPE_SECRET_KEY not set — Stripe features are disabled.');
+}
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
 
@@ -6,6 +11,9 @@ const Subscription = require('../models/Subscription');
 // @route   POST /api/subscription/create-session
 exports.createCheckoutSession = async (req, res, next) => {
   try {
+    if (!stripe) {
+      return res.status(503).json({ message: 'Stripe is not configured on this server.' });
+    }
     const user = await User.findById(req.user.id);
 
     const session = await stripe.checkout.sessions.create({
@@ -34,6 +42,11 @@ exports.createCheckoutSession = async (req, res, next) => {
 exports.webhook = async (req, res, next) => {
   const sig = req.headers['stripe-signature'];
   let event;
+
+  if (!stripe) {
+    console.warn('Received webhook but Stripe is not configured.');
+    return res.status(400).send('Stripe not configured');
+  }
 
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
