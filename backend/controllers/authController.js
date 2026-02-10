@@ -73,7 +73,30 @@ exports.login = async (req, res) => {
   }
 };
 
+// exports.getProfile = async (req, res) => {
+//   const user = await User.findById(req.user.id);
+//   res.json({ success: true, user });
+// };
+
+// Add this to your getProfile function
 exports.getProfile = async (req, res) => {
-  const user = await User.findById(req.user.id);
-  res.json({ success: true, user });
-};
+  const user = await User.findById(req.user.id).select('-password')
+  
+  // Ensure usage data is properly set
+  if (!user.usageCount) user.usageCount = 0
+  if (!user.dailyLimit) user.dailyLimit = 5
+  
+  res.json({ 
+    success: true, 
+    user: {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      subscription: user.subscription,
+      usageCount: user.usageCount,
+      dailyLimit: user.dailyLimit,
+      isAdmin: user.isAdmin,
+      createdAt: user.createdAt
+    }
+  })
+}

@@ -29,7 +29,7 @@ const Sidebar = () => {
     { icon: FiHome, label: 'Dashboard', path: '/dashboard' },
     { icon: FiFileText, label: 'Generate Post', path: '/generate' },
     { icon: FiClock, label: 'History', path: '/history' },
-    { icon: FiTrendingUp, label: 'Trending', path: '/trending' },
+   { icon: FiTrendingUp, label: 'Trending', path: '/trending' },
     { icon: FiDollarSign, label: 'Pricing', path: '/pricing' },
     { icon: FiSettings, label: 'Profile', path: '/profile' },
   ]

@@ -21,18 +21,45 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token])
 
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/auth/profile')
-      setUser(response.data.user)
-    } catch (error) {
-      console.error('Failed to fetch user:', error)
-      logout()
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const fetchUser = async () => {
+  //   try {
+  //     const response = await axios.get('http://localhost:5000/api/auth/profile')
+  //     setUser(response.data.user)
+  //   } catch (error) {
+  //     console.error('Failed to fetch user:', error)
+  //     logout()
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
+// Update the fetchUser function
 
+const fetchUser = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/auth/profile')
+    const userData = response.data.user
+    
+    // Ensure usageCount and dailyLimit are properly set
+    if (userData) {
+      userData.usageCount = userData.usageCount || 0
+      userData.dailyLimit = userData.dailyLimit || 5
+    }
+    
+    setUser(userData)
+  } catch (error) {
+    console.error('Failed to fetch user:', error)
+    logout()
+  } finally {
+    setLoading(false)
+  }
+}
+
+// Add a function to refresh user data
+const refreshUser = async () => {
+  if (token) {
+    await fetchUser()
+  }
+}
   const login = async (email, password) => {
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
