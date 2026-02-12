@@ -52,6 +52,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Profile from './pages/Profile'
 import Trending from './pages/Trending'
+import SuperAdminDashboard from './pages/admin/SuperAdminDashboard'
 
 function App() {
   return (
@@ -74,7 +75,7 @@ function App() {
               <Route path="history" element={<History />} />
               <Route path="pricing" element={<Pricing />} />
                <Route path="profile" element={<Profile />} /> 
-              <Route path="admin" element={<AdminDashboard />} />
+              <Route path="admin" element={<SuperAdminDashboard />} />
          <Route path="trending" element={<Trending />} />
             </Route>
           </Routes>

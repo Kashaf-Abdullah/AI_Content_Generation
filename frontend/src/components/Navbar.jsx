@@ -122,7 +122,7 @@ import {
   useColorModeValue,
   Button,
 } from '@chakra-ui/react'
-import { FiMenu, FiX } from 'react-icons/fi' // Using react-icons
+import { FiMenu, FiX,FiUser,FiShield ,FiLogOut } from 'react-icons/fi' // Using react-icons
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -154,13 +154,27 @@ const Navbar = () => {
                 <MenuButton>
                   <Avatar size="sm" name={user.name} bg="brand.500" />
                 </MenuButton>
-                <MenuList>
+                {/* <MenuList>
                   <MenuItem as={Link} to="/profile">Profile</MenuItem>
                   {user.isAdmin && (
                     <MenuItem as={Link} to="/admin">Admin Dashboard</MenuItem>
                   )}
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                </MenuList>
+                </MenuList> */}
+              
+<MenuList>
+  <MenuItem as={Link} to="/profile" icon={<FiUser />}>
+    Profile
+  </MenuItem>
+  {user?.isAdmin && (
+    <MenuItem as={Link} to="/admin" icon={<FiShield />}>
+      Super Admin Dashboard
+    </MenuItem>
+  )}
+  <MenuItem onClick={handleLogout} icon={<FiLogOut />}>
+    Logout
+  </MenuItem>
+</MenuList>
               </Menu>
             </>
           ) : (

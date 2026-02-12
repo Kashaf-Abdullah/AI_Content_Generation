@@ -453,6 +453,7 @@ const Pricing = () => {
             >
               {plan.popular && (
                 <Badge
+                
                   position="absolute"
                   top={-3}
                   left="50%"
