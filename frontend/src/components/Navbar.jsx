@@ -1,4 +1,4 @@
-// // src/components/Navbar.jsx
+
 // import { useState } from 'react'
 // import {
 //   Box,
@@ -14,7 +14,7 @@
 //   useColorModeValue,
 //   Button,
 // } from '@chakra-ui/react'
-// import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
+// import { FiMenu, FiX,FiUser,FiShield ,FiLogOut } from 'react-icons/fi' // Using react-icons
 // import { Link, useNavigate } from 'react-router-dom'
 // import { useAuth } from '../contexts/AuthContext'
 
@@ -46,13 +46,27 @@
 //                 <MenuButton>
 //                   <Avatar size="sm" name={user.name} bg="brand.500" />
 //                 </MenuButton>
-//                 <MenuList>
+//                 {/* <MenuList>
 //                   <MenuItem as={Link} to="/profile">Profile</MenuItem>
 //                   {user.isAdmin && (
 //                     <MenuItem as={Link} to="/admin">Admin Dashboard</MenuItem>
 //                   )}
 //                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
-//                 </MenuList>
+//                 </MenuList> */}
+              
+// <MenuList>
+//   <MenuItem as={Link} to="/profile" icon={<FiUser />}>
+//     Profile
+//   </MenuItem>
+//   {user?.isAdmin && (
+//     <MenuItem as={Link} to="/admin" icon={<FiShield />}>
+//       Super Admin Dashboard
+//     </MenuItem>
+//   )}
+//   <MenuItem onClick={handleLogout} icon={<FiLogOut />}>
+//     Logout
+//   </MenuItem>
+// </MenuList>
 //               </Menu>
 //             </>
 //           ) : (
@@ -66,7 +80,7 @@
 //         <IconButton
 //           display={{ base: 'flex', md: 'none' }}
 //           onClick={() => setIsOpen(!isOpen)}
-//           icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+//           icon={isOpen ? <FiX /> : <FiMenu />}
 //           variant="ghost"
 //           aria-label="Toggle Navigation"
 //         />
@@ -106,7 +120,7 @@
 // }
 
 // export default Navbar
-// src/components/Navbar.jsx
+
 import { useState } from 'react'
 import {
   Box,
@@ -121,8 +135,10 @@ import {
   MenuItem,
   useColorModeValue,
   Button,
+  Badge,
 } from '@chakra-ui/react'
-import { FiMenu, FiX,FiUser,FiShield ,FiLogOut } from 'react-icons/fi' // Using react-icons
+import { FiMenu, FiX, FiUser, FiLogOut, FiShield } from 'react-icons/fi'
+import { FaCrown } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -140,41 +156,60 @@ const Navbar = () => {
   return (
     <Box bg={bg} boxShadow="sm" px={4} py={3} position="sticky" top="0" zIndex="1000">
       <Flex alignItems="center" justifyContent="space-between">
-        <Link to="/">
-          <Text fontSize="2xl" fontWeight="bold" color="brand.500">
-            PostGen AI
-          </Text>
+        <Link to={user?.isAdmin ? "/admin" : "/dashboard"}>
+          <HStack spacing={2}>
+            <Text fontSize="2xl" fontWeight="bold" color="brand.500">
+              PostGen AI
+            </Text>
+            {user?.isAdmin && (
+              <Badge colorScheme="purple" fontSize="sm" p={1}>
+                <HStack spacing={1}>
+                  <FiShield />
+                  <Text>Admin</Text>
+                </HStack>
+              </Badge>
+            )}
+          </HStack>
         </Link>
 
         <HStack spacing={4} display={{ base: 'none', md: 'flex' }}>
           {user ? (
             <>
-              <Text color="gray.600">Welcome, {user.name}</Text>
+              <Text color="gray.600">
+                Welcome, {user.name}
+                {user?.subscription === 'pro' && (
+                  <Badge ml={2} colorScheme="green" variant="subtle">
+                    <HStack spacing={1}>
+                      <FaCrown />
+                      <Text>Pro</Text>
+                    </HStack>
+                  </Badge>
+                )}
+              </Text>
               <Menu>
                 <MenuButton>
-                  <Avatar size="sm" name={user.name} bg="brand.500" />
+                  <Avatar 
+                    size="sm" 
+                    name={user.name} 
+                    bg={user.isAdmin ? 'purple.500' : 'brand.500'} 
+                  />
                 </MenuButton>
-                {/* <MenuList>
-                  <MenuItem as={Link} to="/profile">Profile</MenuItem>
+                <MenuList>
+                  <MenuItem as={Link} to="/profile" icon={<FiUser />}>
+                    Profile
+                  </MenuItem>
+                  
+                  {/* Show Admin Dashboard link ONLY for admins */}
                   {user.isAdmin && (
-                    <MenuItem as={Link} to="/admin">Admin Dashboard</MenuItem>
+                    <MenuItem as={Link} to="/admin" icon={<FiShield />}>
+                      Admin Dashboard
+                    </MenuItem>
                   )}
-                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                </MenuList> */}
-              
-<MenuList>
-  <MenuItem as={Link} to="/profile" icon={<FiUser />}>
-    Profile
-  </MenuItem>
-  {user?.isAdmin && (
-    <MenuItem as={Link} to="/admin" icon={<FiShield />}>
-      Super Admin Dashboard
-    </MenuItem>
-  )}
-  <MenuItem onClick={handleLogout} icon={<FiLogOut />}>
-    Logout
-  </MenuItem>
-</MenuList>
+                  
+                  <MenuItem onClick={handleLogout} icon={<FiLogOut />}>
+                    Logout
+                  </MenuItem>
+                </MenuList>
               </Menu>
             </>
           ) : (
@@ -194,19 +229,32 @@ const Navbar = () => {
         />
       </Flex>
 
+      {/* Mobile Menu */}
       {isOpen && (
         <Box pb={4} display={{ md: 'none' }}>
           {user ? (
             <>
-              <Text mb={2} px={4} color="gray.600">Welcome, {user.name}</Text>
+              <HStack spacing={2} mb={2} px={4}>
+                <Text color="gray.600">Welcome, {user.name}</Text>
+                {user?.subscription === 'pro' && (
+                  <Badge colorScheme="green">Pro</Badge>
+                )}
+                {user?.isAdmin && (
+                  <Badge colorScheme="purple">Admin</Badge>
+                )}
+              </HStack>
+              
               <Button as={Link} to="/profile" w="full" variant="ghost" justifyContent="flex-start">
                 Profile
               </Button>
+              
+              {/* Show Admin Dashboard link ONLY for admins */}
               {user.isAdmin && (
                 <Button as={Link} to="/admin" w="full" variant="ghost" justifyContent="flex-start">
                   Admin Dashboard
                 </Button>
               )}
+              
               <Button onClick={handleLogout} w="full" variant="ghost" justifyContent="flex-start">
                 Logout
               </Button>
