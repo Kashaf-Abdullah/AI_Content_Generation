@@ -1,12 +1,46 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { 
+  createNewUserNotification 
+} = require('./notificationController');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
 // REGISTER - MANUAL HASH
+// exports.register = async (req, res) => {
+//   try {
+//     const { email, password, name } = req.body;
+
+//     // Check user exists
+//     const userExists = await User.findOne({ email });
+//     if (userExists) {
+//       return res.status(400).json({ message: 'User already exists' });
+//     }
+
+//     // ✅ MANUAL HASH BEFORE SAVE
+//     const hashedPassword = await bcrypt.hash(password, 12);
+    
+//     const user = await User.create({
+//       email,
+//       password: hashedPassword,  // Already hashed!
+//       name
+//     });
+
+//     const token = generateToken(user._id);
+
+//     res.status(201).json({
+//       success: true,
+//       token,
+//       user: { id: user._id, email: user.email, name: user.name }
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+// In register function, after user creation:
 exports.register = async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -17,14 +51,17 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // ✅ MANUAL HASH BEFORE SAVE
+    // MANUAL HASH BEFORE SAVE
     const hashedPassword = await bcrypt.hash(password, 12);
     
     const user = await User.create({
       email,
-      password: hashedPassword,  // Already hashed!
+      password: hashedPassword,
       name
     });
+
+    // 🔔 CREATE WELCOME NOTIFICATION AND NOTIFY ADMINS
+    await createNewUserNotification(user._id);
 
     const token = generateToken(user._id);
 
@@ -37,7 +74,6 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // LOGIN
 exports.login = async (req, res) => {
   try {

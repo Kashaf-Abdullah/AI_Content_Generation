@@ -1,3 +1,6 @@
+// Add this import at the top
+const { createPostNotification } = require('./notificationController');
+
 const Post = require('../models/Post');
 const User = require('../models/User');
 const { generateCaption } = require('../utils/aiClient');
@@ -52,7 +55,15 @@ exports.generatePost = async (req, res) => {
 
     user.usageCount += 1;
     await user.save();
+// 🔔 CREATE POST GENERATION NOTIFICATION
+    await createPostNotification(userId, post);
 
+    // Check if user reached daily limit
+    if (user.subscription === 'free' && user.usageCount >= user.dailyLimit) {
+      // Import this at the top
+      const { createLimitReachedNotification } = require('./notificationController');
+      await createLimitReachedNotification(userId);
+    }
     res.json({
       success: true,
       post: { 

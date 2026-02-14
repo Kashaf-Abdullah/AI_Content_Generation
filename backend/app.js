@@ -32,7 +32,8 @@ app.use(express.urlencoded({ extended: true }));
 // Rate limiting
 app.use('/api/', limiter);
 app.use('/api/posts/generate', aiLimiter);
-
+// Add this line with other routes
+app.use('/api/notifications', require('./routes/notifications'));
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({

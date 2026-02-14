@@ -78,7 +78,7 @@
 // };
 
 
-
+const { createAdminActionNotification } = require('./notificationController');
 const User = require('../models/User');
 const Post = require('../models/Post');
 const Subscription = require('../models/Subscription');
@@ -215,7 +215,17 @@ exports.toggleAdmin = async (req, res) => {
     
     user.isAdmin = isAdmin;
     await user.save();
-    
+       // 🔔 CREATE ADMIN ACTION NOTIFICATION
+    await createAdminActionNotification(
+      req.user.id, // Admin who performed action
+      isAdmin ? 'granted_admin' : 'revoked_admin',
+      user, // Target user
+      {
+        message: isAdmin 
+          ? 'You have been granted admin privileges' 
+          : 'Your admin privileges have been revoked'
+      }
+    );
     res.json({ 
       success: true, 
       message: `Admin status ${isAdmin ? 'granted' : 'revoked'}`,
@@ -246,6 +256,17 @@ exports.toggleSubscription = async (req, res) => {
     user.subscription = subscription;
     user.dailyLimit = subscription === 'pro' ? 9999 : 5;
     await user.save();
+    // 🔔 CREATE ADMIN ACTION NOTIFICATION
+    await createAdminActionNotification(
+      req.user.id,
+      subscription === 'pro' ? 'upgraded_to_pro' : 'downgraded_to_free',
+      user,
+      {
+        message: subscription === 'pro' 
+          ? 'You have been upgraded to Pro by an administrator' 
+          : 'Your account has been downgraded to Free'
+      }
+    );
     
     // Update or create subscription record
     if (subscription === 'pro') {

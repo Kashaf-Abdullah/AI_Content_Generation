@@ -1,409 +1,12 @@
-// const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-// const User = require('../models/User');
-// const Subscription = require('../models/Subscription');
 
-// // @desc    Create Stripe checkout session
-// // @route   POST /api/subscription/create-session
-// // exports.createCheckoutSession = async (req, res, next) => {
-// //   try {
-// //     const user = await User.findById(req.user.id);
-
-// //     const session = await stripe.checkout.sessions.create({
-// //       payment_method_types: ['card'],
-// //       line_items: [{
-// //         price: process.env.STRIPE_PRO_PRICE_ID, // Your price ID from Stripe dashboard
-// //         quantity: 1,
-// //       }],
-// //       mode: 'subscription',
-// //       success_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
-// //       cancel_url: `${process.env.FRONTEND_URL}/dashboard?cancel=true`,
-// //       customer_email: user.email,
-// //       metadata: {
-// //         userId: user._id.toString()
-// //       }
-// //     });
-
-// //     res.json({ success: true, sessionId: session.id });
-// //   } catch (error) {
-// //     res.status(500).json({ message: error.message });
-// //   }
-// // };
-
-// // exports.createCheckoutSession = async (req, res) => {
-// //   try {
-// //     const user = await User.findById(req.user.id);
-
-// //     // Check if user already has active subscription
-// //     const existingSubscription = await Subscription.findOne({ 
-// //       userId: user._id, 
-// //       status: 'active' 
-// //     });
-    
-// //     if (existingSubscription) {
-// //       return res.status(400).json({ 
-// //         message: 'You already have an active subscription' 
-// //       });
-// //     }
-
-// //     // Validate Stripe configuration
-// //     if (!process.env.STRIPE_PRO_PRICE_ID) {
-// //       return res.status(500).json({ 
-// //         message: 'Stripe price ID not configured' 
-// //       });
-// //     }
-
-// //     if (!process.env.FRONTEND_URL) {
-// //       return res.status(500).json({ 
-// //         message: 'Frontend URL not configured' 
-// //       });
-// //     }
-
-// //     // Create Stripe checkout session
-// //     const session = await stripe.checkout.sessions.create({
-// //       payment_method_types: ['card'],
-// //       line_items: [{
-// //         price: process.env.STRIPE_PRO_PRICE_ID, // Your Stripe Price ID
-// //         quantity: 1,
-// //       }],
-// //       mode: 'subscription',
-// //       success_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
-// //       cancel_url: `${process.env.FRONTEND_URL}/dashboard?cancel=true`,
-// //       customer_email: user.email,
-// //       metadata: {
-// //         userId: user._id.toString()
-// //       }
-// //     });
-
-// //     res.json({ 
-// //       success: true, 
-// //       sessionId: session.id,
-// //       url: session.url // Optional: Send session URL directly
-// //     });
-// //   } catch (error) {
-// //     console.error('Stripe checkout error:', error);
-// //     res.status(500).json({ 
-// //       message: error.message || 'Failed to create checkout session',
-// //       details: process.env.NODE_ENV === 'development' ? error : undefined
-// //     });
-// //   }
-// // };
-
-// exports.createCheckoutSession = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user.id);
-    
-//     console.log('=== Creating checkout session ===');
-    
-//     // Check for existing active subscription
-//     const existingSub = await Subscription.findOne({
-//       userId: user._id,
-//       status: 'active'
-//     });
-    
-//     if (existingSub) {
-//       console.log('User already has active subscription');
-//       return res.status(400).json({ 
-//         message: 'You already have an active Pro subscription' 
-//       });
-//     }
-    
-//     // Create checkout session with return_url (for new Stripe.js)
-//     const session = await stripe.checkout.sessions.create({
-//       payment_method_types: ['card'],
-//       line_items: [{
-//         price: process.env.STRIPE_PRO_PRICE_ID, // Use your new price ID
-//         quantity: 1,
-//       }],
-//       mode: 'subscription',
-//       success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-//       cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/pricing?canceled=true`,
-//       customer_email: user.email,
-//       metadata: {
-//         userId: user._id.toString(),
-//         userEmail: user.email,
-//         plan: 'pro_monthly'
-//       }
-//     });
-    
-//     console.log('✅ Session created:', session.id);
-//     console.log('✅ Session URL:', session.url);
-    
-//     // Return BOTH sessionId and url for compatibility
-//     res.json({
-//       success: true,
-//       sessionId: session.id,
-//       url: session.url, // IMPORTANT: This is the checkout URL
-//       message: 'Redirect to Stripe checkout'
-//     });
-    
-//   } catch (error) {
-//     console.error('❌ Checkout error:', error);
-    
-//     res.status(500).json({
-//       success: false,
-//       message: 'Failed to create checkout session',
-//       error: error.message,
-//       details: process.env.NODE_ENV === 'development' ? {
-//         type: error.type,
-//         code: error.code
-//       } : undefined
-//     });
-//   }
-// };
-
-// // @desc    Stripe webhook for subscription events
-// // @route   POST /api/subscription/webhook
-// // exports.webhook = async (req, res, next) => {
-// //   const sig = req.headers['stripe-signature'];
-// //   let event;
-
-// //   try {
-// //     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-// //   } catch (err) {
-// //     console.error('Webhook signature verification failed:', err);
-// //     return res.status(400).send(`Webhook Error: ${err.message}`);
-// //   }
-
-// //   // Handle subscription events
-// //   switch (event.type) {
-// //     case 'checkout.session.completed':
-// //       const session = event.data.object;
-// //       const userId = session.metadata.userId;
-      
-// //       const user = await User.findById(userId);
-// //       user.subscription = 'pro';
-// //       user.dailyLimit = 999; // Unlimited
-// //       await user.save();
-      
-// //       // Create subscription record
-// //       await Subscription.create({
-// //         userId,
-// //         stripeSubscriptionId: session.subscription,
-// //         stripeCustomerId: session.customer,
-// //         plan: 'pro-monthly',
-// //         status: 'active',
-// //         currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-// //       });
-// //       break;
-
-// //     case 'customer.subscription.deleted':
-// //       const subscriptionId = event.data.object.id;
-// //       await Subscription.findOneAndUpdate(
-// //         { stripeSubscriptionId: subscriptionId },
-// //         { status: 'canceled' }
-// //       );
-// //       await User.findOneAndUpdate(
-// //         { _id: event.data.object.metadata.userId },
-// //         { subscription: 'free', dailyLimit: 5 }
-// //       );
-// //       break;
-
-// //     default:
-// //       console.log(`Unhandled event type: ${event.type}`);
-// //   }
-
-// //   res.json({ received: true });
-// // };
-
-// // @desc    Get subscription status
-// // @route   GET /api/subscription/status
-// exports.getSubscriptionStatus = async (req, res, next) => {
-//   try {
-//     const subscription = await Subscription.findOne({ userId: req.user.id });
-//     res.json({ success: true, subscription });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
-// // Add this debug endpoint
-// exports.checkSubscription = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user.id);
-//     const subscription = await Subscription.findOne({ userId: user._id });
-    
-//     res.json({
-//       user: {
-//         id: user._id,
-//         email: user.email,
-//         subscription: user.subscription,
-//         dailyLimit: user.dailyLimit,
-//         usageCount: user.usageCount
-//       },
-//       subscription: subscription,
-//       stripe: {
-//         priceId: process.env.STRIPE_PRO_PRICE_ID,
-//         hasWebhook: !!process.env.STRIPE_WEBHOOK_SECRET
-//       }
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// // @desc    Stripe webhook for subscription events
-// // @route   POST /api/subscription/webhook
-// exports.webhook = async (req, res) => {
-//   const sig = req.headers['stripe-signature'];
-//   let event;
-
-//   try {
-//     // Verify webhook signature
-//     event = stripe.webhooks.constructEvent(
-//       req.body,
-//       sig,
-//       process.env.STRIPE_WEBHOOK_SECRET
-//     );
-    
-//     console.log('🔔 Webhook received:', event.type);
-    
-//   } catch (err) {
-//     console.error('❌ Webhook signature verification failed:', err.message);
-//     return res.status(400).send(`Webhook Error: ${err.message}`);
-//   }
-
-//   // Handle the event
-//   switch (event.type) {
-//     case 'checkout.session.completed':
-//       await handleCheckoutSessionCompleted(event.data.object);
-//       break;
-      
-//     case 'customer.subscription.created':
-//     case 'customer.subscription.updated':
-//       await handleSubscriptionUpdated(event.data.object);
-//       break;
-      
-//     case 'customer.subscription.deleted':
-//       await handleSubscriptionDeleted(event.data.object);
-//       break;
-      
-//     case 'invoice.paid':
-//       await handleInvoicePaid(event.data.object);
-//       break;
-      
-//     default:
-//       console.log(`Unhandled event type: ${event.type}`);
-//   }
-
-//   // Return a 200 response to acknowledge receipt of the event
-//   res.json({ received: true });
-// };
-
-// // Handle completed checkout
-// async function handleCheckoutSessionCompleted(session) {
-//   try {
-//     console.log('💰 Checkout session completed:', session.id);
-    
-//     const userId = session.metadata?.userId;
-//     if (!userId) {
-//       console.error('No userId in session metadata');
-//       return;
-//     }
-    
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       console.error('User not found:', userId);
-//       return;
-//     }
-    
-//     // Update user to pro
-//     user.subscription = 'pro';
-//     user.dailyLimit = 9999; // Unlimited
-//     await user.save();
-    
-//     console.log(`✅ User ${user.email} upgraded to Pro`);
-    
-//     // Create or update subscription record
-//     await Subscription.findOneAndUpdate(
-//       { userId: user._id },
-//       {
-//         userId: user._id,
-//         stripeSubscriptionId: session.subscription,
-//         stripeCustomerId: session.customer,
-//         plan: 'pro-monthly',
-//         status: 'active',
-//         currentPeriodEnd: new Date(session.subscription_details?.current_period_end * 1000 || Date.now() + 30 * 24 * 60 * 60 * 1000),
-//         priceId: session.line_items?.data[0]?.price?.id
-//       },
-//       { upsert: true, new: true }
-//     );
-    
-//   } catch (error) {
-//     console.error('Error handling checkout session:', error);
-//   }
-// }
-
-// // Handle subscription updates
-// async function handleSubscriptionUpdated(subscription) {
-//   try {
-//     console.log('📝 Subscription updated:', subscription.id);
-    
-//     const subRecord = await Subscription.findOne({ 
-//       stripeSubscriptionId: subscription.id 
-//     });
-    
-//     if (subRecord) {
-//       subRecord.status = subscription.status;
-//       subRecord.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
-//       await subRecord.save();
-      
-//       // Update user if subscription is active
-//       if (subscription.status === 'active') {
-//         await User.findByIdAndUpdate(subRecord.userId, {
-//           subscription: 'pro',
-//           dailyLimit: 9999
-//         });
-//       }
-//     }
-    
-//   } catch (error) {
-//     console.error('Error handling subscription update:', error);
-//   }
-// }
-
-// // Handle subscription deletion
-// async function handleSubscriptionDeleted(subscription) {
-//   try {
-//     console.log('🗑️ Subscription deleted:', subscription.id);
-    
-//     const subRecord = await Subscription.findOne({ 
-//       stripeSubscriptionId: subscription.id 
-//     });
-    
-//     if (subRecord) {
-//       subRecord.status = 'canceled';
-//       await subRecord.save();
-      
-//       // Downgrade user to free
-//       await User.findByIdAndUpdate(subRecord.userId, {
-//         subscription: 'free',
-//         dailyLimit: 5
-//       });
-//     }
-    
-//   } catch (error) {
-//     console.error('Error handling subscription deletion:', error);
-//   }
-// }
-
-// // Handle paid invoice
-// async function handleInvoicePaid(invoice) {
-//   try {
-//     console.log('🧾 Invoice paid:', invoice.id);
-    
-//     // You can add additional logic here if needed
-//     // For example, send confirmation email
-    
-//   } catch (error) {
-//     console.error('Error handling invoice paid:', error);
-//   }
-// }
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
-
+const { 
+  createSubscriptionNotification, 
+  createPaymentSuccessNotification 
+} = require('./notificationController');
 // @desc    Create Stripe checkout session
 // @route   POST /api/subscription/create-session
 exports.createCheckoutSession = async (req, res) => {
@@ -546,7 +149,19 @@ exports.verifyPayment = async (req, res) => {
       user.dailyLimit = 9999; // Unlimited
       await user.save();
       
+
       console.log(`✅ User ${user.email} upgraded to Pro`);
+  // 🔔 CREATE PAYMENT SUCCESS NOTIFICATION
+      await createPaymentSuccessNotification(user._id, {
+        amount: '9.99',
+        sessionId: session.id
+      });
+
+      // 🔔 CREATE SUBSCRIPTION UPGRADE NOTIFICATION
+      await createSubscriptionNotification(user._id, {
+        plan: 'pro-monthly',
+        amount: '9.99'
+      });
 
       // Create or update subscription record
       const subscriptionData = {
@@ -691,7 +306,16 @@ async function handleCheckoutSessionCompleted(session) {
       await user.save();
       
       console.log(`✅ User ${user.email} upgraded to Pro via webhook`);
-      
+        // 🔔 CREATE NOTIFICATIONS VIA WEBHOOK
+      await createPaymentSuccessNotification(user._id, {
+        amount: '9.99',
+        sessionId: session.id
+      });
+
+      await createSubscriptionNotification(user._id, {
+        plan: 'pro-monthly',
+        amount: '9.99'
+      });
       // Create or update subscription record
       await Subscription.findOneAndUpdate(
         { userId: user._id },
