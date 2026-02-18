@@ -1,54 +1,5 @@
 
 
-// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-// import { Box } from '@chakra-ui/react'
-// import Layout from './components/Layout'
-// import Dashboard from './pages/Dashboard'
-// import Generate from './pages/Generate'
-// import History from './pages/History'
-// import Login from './pages/Login'
-// import Register from './pages/Register'
-// import Pricing from './pages/Pricing'
-// import AdminDashboard from './pages/admin/AdminDashboard'
-// import { AuthProvider } from './contexts/AuthContext'
-// import ProtectedRoute from './components/ProtectedRoute'
-// import Profile from './pages/Profile'
-// import Trending from './pages/Trending'
-// import SuperAdminDashboard from './pages/admin/SuperAdminDashboard'
-
-// function App() {
-//   return (
-//     <Router>
-//       <AuthProvider>
-//         <Box minH="100vh" bg="gray.50">
-//           <Routes>
-//             <Route path="/login" element={<Login />} />
-//             <Route path="/register" element={<Register />} />
-            
-//             {/* Protected Routes */}
-//             <Route path="/" element={
-//               <ProtectedRoute>
-//                 <Layout />
-//               </ProtectedRoute>
-//             }>
-//               <Route index element={<Navigate to="/dashboard" replace />} />
-//               <Route path="dashboard" element={<Dashboard />} />
-//               <Route path="generate" element={<Generate />} />
-//               <Route path="history" element={<History />} />
-//               <Route path="pricing" element={<Pricing />} />
-//                <Route path="profile" element={<Profile />} /> 
-//               <Route path="admin" element={<SuperAdminDashboard />} />
-//          <Route path="trending" element={<Trending />} />
-//             </Route>
-//           </Routes>
-//         </Box>
-//       </AuthProvider>
-//     </Router>
-//   )
-// }
-
-// export default App
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Box,Heading,Button,Text } from '@chakra-ui/react'
 import Layout from './components/Layout'
