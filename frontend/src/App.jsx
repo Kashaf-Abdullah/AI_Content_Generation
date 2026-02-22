@@ -16,6 +16,7 @@ import SuperAdminDashboard from './pages/admin/SuperAdminDashboard'
 import { AuthProvider } from './contexts/AuthContext'
 import RoleBasedRoute from './components/RoleBasedRoute'
 import { Link, useLocation } from 'react-router-dom'
+import Schedule from './pages/Schedule'
 function App() {
   return (
     <Router>
@@ -41,7 +42,7 @@ function App() {
               <Route path="trending" element={<Trending />} />
               <Route path="pricing" element={<Pricing />} />
               <Route path="profile" element={<Profile />} />
-              
+                   <Route path="schedule" element={<Schedule />} />
               {/* Admin Routes - Only accessible to users with isAdmin = true */}
               <Route path="admin" element={
                 <RoleBasedRoute adminOnly={true}>

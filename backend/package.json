@@ -8,7 +8,6 @@
     "start": "node server.js",
     "codespace": "npm run dev"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -25,8 +24,10 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
     "morgan": "^1.10.1",
-    "openai": "^6.16.0",
+    "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
     "node-fetch": "^2.6.7",
+    "openai": "^6.16.0",
     "rate-limit-redis": "^4.3.1",
     "stripe": "^20.2.0"
   },

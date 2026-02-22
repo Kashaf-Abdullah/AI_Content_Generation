@@ -1,6 +1,7 @@
 require('dotenv').config({ path: './.env' });
 const app = require('./app');
 const connectDB = require('./config/database');
+const schedulerService = require('./services/schedulerService');
 
 const PORT = process.env.PORT || 5000;
 
@@ -18,6 +19,9 @@ const startServer = async () => {
   try {
     await connectDB();
     console.log('✅ MongoDB Connected.');
+ // Start the scheduler
+    schedulerService.start();
+    console.log('✅ Scheduler Service Started');
 
     // AI provider key validation
     if (process.env.AI_PROVIDER === 'GEMINI') {

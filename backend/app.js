@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { limiter, aiLimiter } = require('./middleware/rateLimit');
@@ -28,12 +29,14 @@ if (process.env.NODE_ENV === 'development') {
 // Body parsers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rate limiting
 app.use('/api/', limiter);
 app.use('/api/posts/generate', aiLimiter);
 // Add this line with other routes
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/schedule',require('./routes/schedule'));
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({
